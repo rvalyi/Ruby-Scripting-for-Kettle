@@ -41,6 +41,8 @@ import org.typeexit.kettle.plugin.steps.ruby.streams.StdStreamWriter;
 import org.typeexit.kettle.plugin.steps.ruby.streams.StepStreamReader;
 import org.typeexit.kettle.plugin.steps.ruby.streams.StepStreamWriter;
 
+import java.lang.System;
+
 public class SimpleExecutionModel implements ExecutionModel {
 
 	private RubyStepData data;
@@ -61,8 +63,12 @@ public class SimpleExecutionModel implements ExecutionModel {
 
 			data.forcedHalt = false;
 
-			data.container = RubyStepFactory.createScriptingContainer(true, meta.getRubyVersion());
+			data.container = RubyStepFactory.createScriptingContainer(true, meta.getRubyVersion(), step.getDispatcher().getName() + '/' + step.getStepname());
 
+            System.out.println("initializing " + step.getDispatcher().getName() + '/' + step.getStepname());
+            System.out.println(data.container);
+            System.out.println(data.container.getProvider());
+            System.out.println(data.container.getProvider().getRuntime());
 			data.runtime = data.container.getProvider().getRuntime();
 
 			// set gem home if specified
@@ -137,7 +143,7 @@ public class SimpleExecutionModel implements ExecutionModel {
 		data.bigDecimal = null;
 
 		if (data.container != null) {
-			data.container.terminate();
+//			data.container.terminate(); //FIXME actually call terminate if runtime are not persistent, based on some option
 		}
 
 		data.container = null;

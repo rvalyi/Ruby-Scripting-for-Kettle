@@ -7,12 +7,21 @@ import org.jruby.embed.LocalVariableBehavior;
 import org.jruby.embed.ScriptingContainer;
 import org.typeexit.kettle.plugin.steps.ruby.RubyStepMeta.RubyVersion;
 
+import java.lang.System;
+import java.util.Hashtable;
+
 public class RubyStepFactory {
 
-	synchronized public static ScriptingContainer createScriptingContainer(boolean withPersistentLocalVars, RubyVersion rubyVersion){
-		
-		ScriptingContainer c = new ScriptingContainer(LocalContextScope.SINGLETHREAD, (withPersistentLocalVars)?LocalVariableBehavior.PERSISTENT:LocalVariableBehavior.TRANSIENT);
-		
+    private static Hashtable<String,ScriptingContainer> containers = new Hashtable();
+
+	synchronized public static ScriptingContainer createScriptingContainer(boolean withPersistentLocalVars, RubyVersion rubyVersion, String runtimeKey){
+	    System.out.println("***** calling createScriptingContainer " + runtimeKey);	
+
+        if (containers.get(runtimeKey) == null) { //TODO or force new runtime anyway based on some option.
+        System.out.println("***** new ScriptingContainer");
+        ScriptingContainer c = new ScriptingContainer(LocalContextScope.SINGLETHREAD, LocalVariableBehavior.TRANSIENT);//FIXME: won't work with LocalVariableBehavior.PERSISTENT, but is that bad?
+        containers.put(runtimeKey, c);
+
 		switch(rubyVersion){
 		case RUBY_1_8:
 			c.setCompatVersion(CompatVersion.RUBY1_8);
@@ -34,8 +43,9 @@ public class RubyStepFactory {
 //		paths.add(c.getHomeDirectory());
 //		paths.add(ScriptingContainer.class.getProtectionDomain().getCodeSource().getLocation().toString());
 //		c.setLoadPaths(paths); 
+        }
 				
-		return c;
+        return containers.get(runtimeKey);
 		
 	}
 	

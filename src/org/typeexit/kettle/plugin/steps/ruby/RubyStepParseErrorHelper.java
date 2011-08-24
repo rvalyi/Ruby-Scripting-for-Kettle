@@ -31,7 +31,7 @@ public class RubyStepParseErrorHelper {
 		
 		Display display = Display.getDefault();
 		errorLineColor = new Color(display, new RGB(255,220,220));
-		container = RubyStepFactory.createScriptingContainer(false, version);
+		container = RubyStepFactory.createScriptingContainer(false, version, "dummy");
 
 		// do not litter the console with potential parse errors
 		container.setError(new PrintStream(new NullOutputStream()));
